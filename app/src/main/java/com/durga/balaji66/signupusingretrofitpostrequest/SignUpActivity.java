@@ -10,8 +10,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.io.IOException;
+
 import javax.xml.transform.Result;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -78,21 +81,28 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         //Defining the user object as we need to pass it with the call
         User user = new User(name, email, phone, password, fine);
 
-        Call<Result> call =service.createUser(user.getName(),user.getEmail(),user.getPhone(),user.getPassword(), user.getFine());
-
+        Call<ResponseBody> call =APIUrl.getmInstance().getApi().createUser(name,email,phone,password,fine);
         //calling the api
-        call.enqueue(new Callback<Result>() {
+        call.enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(Call<Result> call, Response<Result> response) {
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 //hiding progress dialog
                 progressDialog.dismiss();
+                try
+                {
+                    String s =response.body().string();
+                    //displaying the message from the response as toast
+                    Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
 
-                //displaying the message from the response as toast
-                Toast.makeText(getApplicationContext(), response.message(), Toast.LENGTH_LONG).show();
-            }
+                     }
 
             @Override
-            public void onFailure(Call<Result> call, Throwable t) {
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
                 progressDialog.dismiss();
                 Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
 
@@ -106,30 +116,40 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         String password =mPassword.getText().toString().trim();
         if(name.equals(""))
         {
-            Toast.makeText(getApplicationContext(),"Name must not be empty",Toast.LENGTH_LONG).show();
+            mName.setError("Name must not be empty");
+            //Toast.makeText(getApplicationContext(),"Name must not be empty",Toast.LENGTH_LONG).show();
         }
         else if(phone.equals(""))
         {
-            Toast.makeText(getApplicationContext(),"phone must not be empty",Toast.LENGTH_LONG).show();
+            mPhone.setError("phone must not be empty");
+            //Toast.makeText(getApplicationContext(),"phone must not be empty",Toast.LENGTH_LONG).show();
         }
         else if(phone.length() > 10 || phone.length() < 10)
         {
-            Toast.makeText(getApplicationContext(),"Enter 10 digit mobile number",Toast.LENGTH_LONG).show();
+            mPhone.setError("Enter 10 digit mobile number");
+            //Toast.makeText(getApplicationContext(),"Enter 10 digit mobile number",Toast.LENGTH_LONG).show();
         }
         else if(email.equals(""))
         {
-            Toast.makeText(getApplicationContext(),"Email must not be empty",Toast.LENGTH_LONG).show();
+            mEmail.setError("Email must not be empty");
+            //Toast.makeText(getApplicationContext(),"Email must not be empty",Toast.LENGTH_LONG).show();
         }
         else if(!Patterns.EMAIL_ADDRESS.matcher(email).matches())
         {
-            Toast.makeText(getApplicationContext(),"Enter Valid Email Id",Toast.LENGTH_LONG).show();
+            mEmail.setError("Enter Valid Email Id");
+            //Toast.makeText(getApplicationContext(),"Enter Valid Email Id",Toast.LENGTH_LONG).show();
         }
         else if(password.equals(""))
         {
-            Toast.makeText(getApplicationContext(),"Password must not be empty",Toast.LENGTH_LONG).show();
+            mPassword.setError("Password must not be empty");
+            //Toast.makeText(getApplicationContext(),"Password must not be empty",Toast.LENGTH_LONG).show();
+        }
+        else
+        {
+            return true;
         }
 
-        return true;
+        return false;
     }
 }
 
