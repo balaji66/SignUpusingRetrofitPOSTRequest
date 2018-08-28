@@ -1,7 +1,6 @@
 package com.durga.balaji66.signupusingretrofitpostrequest;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Patterns;
@@ -10,16 +9,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.io.IOException;
+import com.durga.balaji66.signupusingretrofitpostrequest.Models.DefaultResponse;
 
-import javax.xml.transform.Result;
-
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -73,27 +67,28 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         String password = mPassword.getText().toString().trim();
         int fine = 0;
 
-        Call<ResponseBody> call = APIUrl.getmInstance().getApi().newCustomerRegistration(name, email, phone, password, fine);
+        Call<DefaultResponse> call = APIUrl.getmInstance().getApi().newCustomerRegistration(name, email, phone, password, fine);
         //calling the api
-        call.enqueue(new Callback<ResponseBody>() {
+        call.enqueue(new Callback<DefaultResponse>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                //hiding progress dialog
-                progressDialog.dismiss();
-                try {
-                    String s = response.body().string();
-                    //displaying the message from the response as toast
-                    Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
-                } catch (IOException e) {
-                    e.printStackTrace();
+            public void onResponse(Call<DefaultResponse> call, Response<DefaultResponse> response) {
+                if(response.code() == 200)
+                {
+                    progressDialog.dismiss();
+                    DefaultResponse dr =response.body();
+                    Toast.makeText(getApplicationContext(),dr.getMessage(),Toast.LENGTH_LONG).show();
+                }
+                else
+                {
+                    progressDialog.dismiss();
+                    Toast.makeText(getApplicationContext(),"Email or Mobile Number already exist, please login",Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
-
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                progressDialog.dismiss();
-                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+            public void onFailure(Call<DefaultResponse> call, Throwable t) {
+                    progressDialog.dismiss();
+                    Toast.makeText(getApplicationContext(),t.getMessage(),Toast.LENGTH_LONG).show();
             }
         });
     }
