@@ -21,10 +21,11 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class SignUpActivity extends AppCompatActivity implements View.OnClickListener{
+public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
     private EditText mName, mPhone, mEmail, mPassword;
     private Button mSignUp;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,118 +35,93 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         //https://pusuluribalaji66.000webhostapp.comCabManagement/public/customerregister
     }
+
     public void initializeViews() {
-        mName =(EditText)findViewById(R.id.editTextName);
-        mPhone =(EditText)findViewById(R.id.editTextPhone);
-        mEmail =(EditText)findViewById(R.id.editTextEmail);
-        mPassword =(EditText)findViewById(R.id.editTextPassword);
-        mSignUp =(Button)findViewById(R.id.buttonSignUp);
+        mName = (EditText) findViewById(R.id.editTextName);
+        mPhone = (EditText) findViewById(R.id.editTextPhone);
+        mEmail = (EditText) findViewById(R.id.editTextEmail);
+        mPassword = (EditText) findViewById(R.id.editTextPassword);
+        mSignUp = (Button) findViewById(R.id.buttonSignUp);
     }
-    public void initializeListeners()
-    {
+
+    public void initializeListeners() {
         mSignUp.setOnClickListener(this);
     }
+
     @Override
     public void onClick(View v) {
-        switch (v.getId())
-        {
+        switch (v.getId()) {
             case R.id.buttonSignUp:
 
                 validation();
-                if(validation())
-                {
+                if (validation()) {
                     retrofitSignUpCode();
                 }
                 break;
         }
     }
-    public void retrofitSignUpCode()
-    {
+
+    public void retrofitSignUpCode() {
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Signing Up...");
         progressDialog.show();
 
-        String name =mName.getText().toString().trim();
-        String email =mEmail.getText().toString().trim();
-        String phone =mPhone.getText().toString().trim();
-        String password =mPassword.getText().toString().trim();
-        int fine =10;
-        //building retrofit object
-        Retrofit retrofit =new Retrofit.Builder()
-                .baseUrl(APIUrl.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        //Defining retrofit api service
-        ApiService service = retrofit.create(ApiService.class);
+        //getting editText values and storing in variables
+        String name = mName.getText().toString().trim();
+        String email = mEmail.getText().toString().trim();
+        String phone = mPhone.getText().toString().trim();
+        String password = mPassword.getText().toString().trim();
+        int fine = 0;
 
-        //Defining the user object as we need to pass it with the call
-        User user = new User(name, email, phone, password, fine);
-
-        Call<ResponseBody> call =APIUrl.getmInstance().getApi().createUser(name,email,phone,password,fine);
+        Call<ResponseBody> call = APIUrl.getmInstance().getApi().newCustomerRegistration(name, email, phone, password, fine);
         //calling the api
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 //hiding progress dialog
                 progressDialog.dismiss();
-                try
-                {
-                    String s =response.body().string();
+                try {
+                    String s = response.body().string();
                     //displaying the message from the response as toast
                     Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
-                }
-                catch (IOException e)
-                {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-                     }
+            }
 
             @Override
+
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 progressDialog.dismiss();
                 Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
-
             }
         });
     }
+
     public boolean validation() {
-        String name =mName.getText().toString().trim();
-        CharSequence phone =mPhone.getText().toString().trim();
-        String email =mEmail.getText().toString().trim();
-        String password =mPassword.getText().toString().trim();
-        if(name.equals(""))
-        {
+        String name = mName.getText().toString().trim();
+        CharSequence phone = mPhone.getText().toString().trim();
+        String email = mEmail.getText().toString().trim();
+        String password = mPassword.getText().toString().trim();
+        if (name.equals("")) {
             mName.setError("Name must not be empty");
             //Toast.makeText(getApplicationContext(),"Name must not be empty",Toast.LENGTH_LONG).show();
-        }
-        else if(phone.equals(""))
-        {
+        } else if (phone.equals("")) {
             mPhone.setError("phone must not be empty");
             //Toast.makeText(getApplicationContext(),"phone must not be empty",Toast.LENGTH_LONG).show();
-        }
-        else if(phone.length() > 10 || phone.length() < 10)
-        {
+        } else if (phone.length() > 10 || phone.length() < 10) {
             mPhone.setError("Enter 10 digit mobile number");
             //Toast.makeText(getApplicationContext(),"Enter 10 digit mobile number",Toast.LENGTH_LONG).show();
-        }
-        else if(email.equals(""))
-        {
+        } else if (email.equals("")) {
             mEmail.setError("Email must not be empty");
             //Toast.makeText(getApplicationContext(),"Email must not be empty",Toast.LENGTH_LONG).show();
-        }
-        else if(!Patterns.EMAIL_ADDRESS.matcher(email).matches())
-        {
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             mEmail.setError("Enter Valid Email Id");
             //Toast.makeText(getApplicationContext(),"Enter Valid Email Id",Toast.LENGTH_LONG).show();
-        }
-        else if(password.equals(""))
-        {
+        } else if (password.equals("")) {
             mPassword.setError("Password must not be empty");
             //Toast.makeText(getApplicationContext(),"Password must not be empty",Toast.LENGTH_LONG).show();
-        }
-        else
-        {
+        } else {
             return true;
         }
 

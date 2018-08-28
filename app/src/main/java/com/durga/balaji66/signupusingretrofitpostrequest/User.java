@@ -7,9 +7,7 @@ public class User {
     private String password;
     private int fine;
 
-    public User()
-    {
-
+    public User() {
     }
     public User(String name, String email, String phone, String password, int fine)
     {

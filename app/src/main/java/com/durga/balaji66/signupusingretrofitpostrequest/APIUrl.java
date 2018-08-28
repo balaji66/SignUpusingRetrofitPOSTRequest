@@ -5,10 +5,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class APIUrl {
     //https://pusuluribalaji66.000webhostapp.comCabManagement/public/
-    public static final String BASE_URL = "https://pusuluribalaji66.000webhostapp.com/CabManagement/public/";
+    private static final String BASE_URL = "https://pusuluribalaji66.000webhostapp.com/CabManagement/public/";
     private static APIUrl mInstance;
     private Retrofit retrofit;
-
     private APIUrl()
     {
         retrofit =new Retrofit.Builder()
@@ -16,6 +15,7 @@ public class APIUrl {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }
+
     public static synchronized APIUrl getmInstance()
     {
         if(mInstance == null)

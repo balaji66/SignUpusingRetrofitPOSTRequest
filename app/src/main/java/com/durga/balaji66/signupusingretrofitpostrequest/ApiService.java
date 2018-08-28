@@ -10,7 +10,7 @@ public interface ApiService {
     //The Register call
     @FormUrlEncoded
     @POST("customerregister")
-    Call<ResponseBody> createUser(
+    Call<ResponseBody> newCustomerRegistration(
             @Field("customer_name") String name,
             @Field("customer_email") String email,
             @Field("customer_phone") String phone,
